@@ -5,7 +5,7 @@ export default function Header({ userType, setUserType }) {
   return (
     <header>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap' }}>
-        <h1>🌱 Krishi Saathi - Farmer's Companion</h1>
+        <h1>🌱 Krishi Sarthi - Farmer's Companion</h1>
         <select 
           value={userType} 
           onChange={(e) => setUserType(e.target.value)}
