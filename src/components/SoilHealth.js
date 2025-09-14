@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { analyzeSoil as analyzeSoilService } from "../services/soilHealthService";
 
 export default function SoilHealth({ userLocation, setUserLocation }) {
   const [cropType, setCropType] = useState("");
@@ -9,46 +10,37 @@ export default function SoilHealth({ userLocation, setUserLocation }) {
     potassium: ""
   });
   const [results, setResults] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleInputChange = (field, value) => {
     setSoilData(prev => ({ ...prev, [field]: value }));
   };
 
-  const analyzeSoil = () => {
-    const analysis = {
-      pH: parseFloat(soilData.pH) || 0,
-      nitrogen: soilData.nitrogen,
-      phosphorus: soilData.phosphorus,
-      potassium: soilData.potassium
-    };
-
-    let recommendations = [];
-    
-    if (analysis.pH < 6.0) {
-      recommendations.push("Soil is acidic. Apply lime at 2 tons per acre.");
-    } else if (analysis.pH > 7.5) {
-      recommendations.push("Soil is alkaline. Add organic matter and sulfur.");
-    } else {
-      recommendations.push("Soil pH is optimal for most crops.");
+  const handleAnalyzeSoil = async () => {
+    if (!userLocation || !cropType) {
+      setError("Please fill in all required fields");
+      return;
     }
 
-    if (analysis.nitrogen === "low") {
-      recommendations.push("Apply nitrogen-rich fertilizer (Urea: 50kg/acre)");
-    }
+    setLoading(true);
+    setError(null);
 
-    if (analysis.phosphorus === "low") {
-      recommendations.push("Apply phosphorus-rich fertilizer (DAP: 50kg/acre)");
+    try {
+      const result = await analyzeSoilService({
+        location: userLocation,
+        cropType,
+        pH: soilData.pH,
+        nitrogen: soilData.nitrogen,
+        phosphorus: soilData.phosphorus,
+        potassium: soilData.potassium
+      });
+      setResults(result);
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || "Failed to analyze soil. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    if (analysis.potassium === "low") {
-      recommendations.push("Apply potassium-rich fertilizer (MOP: 25kg/acre)");
-    }
-
-    setResults({
-      analysis,
-      recommendations,
-      soilHealth: analysis.pH >= 6.0 && analysis.pH <= 7.5 ? "Good" : "Needs Improvement"
-    });
   };
 
   return (
@@ -120,10 +112,17 @@ export default function SoilHealth({ userLocation, setUserLocation }) {
           </select>
         </label>
 
-        <button onClick={analyzeSoil} disabled={!userLocation || !cropType}>
-          Analyze Soil
+        <button onClick={handleAnalyzeSoil} disabled={!userLocation || !cropType || loading}>
+          {loading ? "Analyzing..." : "Analyze Soil"}
         </button>
       </div>
+
+      {error && (
+        <div className="card error" style={{ marginTop: "1rem" }}>
+          <h3>Error</h3>
+          <p>{String(error)}</p>
+        </div>
+      )}
 
       {results && (
         <div style={{ marginTop: "2rem" }}>

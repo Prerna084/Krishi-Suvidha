@@ -1,64 +1,71 @@
+
 import React, { useState } from "react";
+import { getWeather } from "../services/weatherService";
 
 export default function Weather({ userLocation, setUserLocation }) {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
-  const getWeather = async () => {
+  const fetchWeather = async () => {
     if (!userLocation) return;
-    
+
     setLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-      setWeatherData({
-        temperature: "28°C",
-        humidity: "65%",
-        rainfall: "15mm expected",
-        windSpeed: "12 km/h",
-        forecast: "Partly cloudy with chances of light rain",
-        advisory: "Suitable for wheat cultivation. Irrigation not required for next 48 hours.",
-        alerts: ["Light rain expected in 24 hours"]
-      });
+    setError(null);
+
+    try {
+      const data = await getWeather(userLocation);
+      setWeatherData(data);
+    } catch (err) {
+      setError(err?.response?.data?.error || err.message || "Failed to fetch weather data");
+    } finally {
       setLoading(false);
-    }, 1500);
+    }
   };
 
   return (
     <div>
       <h2>Weather Prediction & Advisory</h2>
-      
+
       <div className="card">
         <label>
           Farm Location
-          <input 
-            type="text" 
-            value={userLocation} 
-            onChange={e => setUserLocation(e.target.value)} 
-            placeholder="Enter your farm location" 
+          <input
+            type="text"
+            value={userLocation}
+            onChange={e => setUserLocation(e.target.value)}
+            placeholder="Enter your farm location"
           />
         </label>
-        
-        <button onClick={getWeather} disabled={!userLocation || loading}>
+
+        <button onClick={fetchWeather} disabled={!userLocation || loading}>
           {loading ? "Loading..." : "Get Weather Forecast"}
         </button>
       </div>
+
+      {error && (
+        <div className="card error" style={{ marginTop: "1rem" }}>
+          <h3>Error</h3>
+          <p>{String(error)}</p>
+        </div>
+      )}
 
       {weatherData && (
         <div style={{ marginTop: "2rem" }}>
           <div className="card">
             <h3>Current Weather Conditions</h3>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem' }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "1rem" }}>
               <div>
-                <strong>Temperature:</strong> {weatherData.temperature}
+                <strong>Temperature:</strong> {weatherData.temperature}°C
               </div>
               <div>
-                <strong>Humidity:</strong> {weatherData.humidity}
+                <strong>Humidity:</strong> {weatherData.humidity}%
               </div>
               <div>
-                <strong>Rainfall:</strong> {weatherData.rainfall}
+                <strong>Rainfall:</strong> {weatherData.rainfall} mm
               </div>
               <div>
-                <strong>Wind Speed:</strong> {weatherData.windSpeed}
+                <strong>Wind Speed:</strong> {weatherData.windSpeed} km/h
               </div>
             </div>
           </div>

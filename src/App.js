@@ -7,6 +7,8 @@ import Weather from "./components/Weather";
 import SoilHealth from "./components/SoilHealth";
 import DiseaseDetection from "./components/DiseaseDetection";
 import LocalResources from "./components/LocalResources";
+import WaterAvailability from "./components/WaterAvailability";
+import CropAdvice from "./components/CropAdvice";
 
 function App() {
   const [userLocation, setUserLocation] = useState("");
@@ -23,6 +25,8 @@ function App() {
           <Route path="/soil-health" element={<SoilHealth userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="/disease-detection" element={<DiseaseDetection userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="/local-resources" element={<LocalResources userLocation={userLocation} setUserLocation={setUserLocation} />} />
+          <Route path="/water" element={<WaterAvailability userLocation={userLocation} setUserLocation={setUserLocation} />} />
+          <Route path="/crop-advice" element={<CropAdvice userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </main>

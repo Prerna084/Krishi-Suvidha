@@ -32,6 +32,12 @@ export default function Header({ userType, setUserType }) {
         <NavLink to="/local-resources" className={({ isActive }) => (isActive ? "active" : "")}>
           Local Resources
         </NavLink>
+        <NavLink to="/water" className={({ isActive }) => (isActive ? "active" : "")}>
+          Water
+        </NavLink>
+        <NavLink to="/crop-advice" className={({ isActive }) => (isActive ? "active" : "")}>
+          Crop Advice
+        </NavLink>
       </nav>
     </header>
   );

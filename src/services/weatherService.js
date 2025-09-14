@@ -1,12 +1,6 @@
-// src/services/weatherService.js
-// src/services/weatherService.js
-import axios from "axios";
+import { get } from "./api";
 
-const API_KEY = "YOUR_OPENWEATHERMAP_API_KEY"; // replace with your key
-
-export async function getWeather(city) {
-  const res = await axios.get(
-    `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${API_KEY}`
-  );
-  return res.data;
+// Fetch weather from our backend
+export async function getWeather(location) {
+  return get(`weather?location=${encodeURIComponent(location)}`);
 }

@@ -1,50 +1,37 @@
 import React, { useState } from "react";
+import { detectDisease as detectDiseaseService } from "../services/diseaseDetectionService";
 
 export default function DiseaseDetection({ userLocation, setUserLocation }) {
   const [cropType, setCropType] = useState("");
-  const [image, setImage] = useState(null);
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
   const [results, setResults] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleImageChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setImage(URL.createObjectURL(e.target.files[0]));
+    const file = e.target.files && e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
       setResults(null);
+      setError(null);
     }
   };
 
   const detectDisease = async () => {
-    if (!cropType || !userLocation || !image) return;
-    
+    if (!cropType || !userLocation || !imageFile) return;
+
     setLoading(true);
-    // Simulate AI detection
-    setTimeout(() => {
-      const mockResults = {
-        disease: "Leaf Rust",
-        confidence: "92%",
-        description: "Fungal infection affecting wheat crops. Appears as orange-brown pustules on leaves.",
-        remedies: [
-          "Apply fungicide containing tebuconazole (1ml/liter water)",
-          "Remove and destroy infected leaves",
-          "Ensure proper spacing (30cm between plants) for air circulation",
-          "Avoid overhead irrigation to reduce humidity"
-        ],
-        preventive: [
-          "Use resistant varieties (HD2967, DBW17)",
-          "Practice crop rotation with legumes",
-          "Maintain field sanitation",
-          "Apply neem-based biopesticides as preventive spray"
-        ],
-        krishiKendra: {
-          name: "Krishi Vigyan Kendra Main",
-          phone: "+91-9876543210",
-          distance: "12km",
-          address: "Near Block Office, Main Road"
-        }
-      };
-      setResults(mockResults);
+    setError(null);
+    try {
+      const res = await detectDiseaseService(imageFile, cropType, userLocation);
+      setResults(res);
+    } catch (err) {
+      setError(err?.message || "Disease detection failed");
+    } finally {
       setLoading(false);
-    }, 2000);
+    }
   };
 
   return (
@@ -84,20 +71,27 @@ export default function DiseaseDetection({ userLocation, setUserLocation }) {
           />
         </label>
 
-        {image && (
+        {imagePreview && (
           <div style={{ marginTop: '1rem' }}>
             <img 
-              src={image} 
+              src={imagePreview} 
               alt="Uploaded crop for disease detection" 
               style={{ maxWidth: '300px', maxHeight: '200px' }}
             />
           </div>
         )}
 
-        <button onClick={detectDisease} disabled={!cropType || !userLocation || !image || loading}>
+        <button onClick={detectDisease} disabled={!cropType || !userLocation || !imageFile || loading}>
           {loading ? "Analyzing..." : "Detect Disease"}
         </button>
       </div>
+
+      {error && (
+        <div className="card error" style={{ marginTop: "1rem" }}>
+          <h3>Error</h3>
+          <p>{String(error)}</p>
+        </div>
+      )}
 
       {results && (
         <div style={{ marginTop: "2rem" }}>

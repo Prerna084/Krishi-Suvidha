@@ -1,12 +1,7 @@
 import React, { useState } from "react";
 import BuyerCard from "./BuyerCard";
 import LogisticsCard from "./LogisticsCard";
-
-const mockBuyers = [
-  { id: 1, name: "Green Valley Agro", distance: "15km", crop: "Wheat, Rice", rating: "4.8", price: "₹2,500/Quintal" },
-  { id: 2, name: "National Food Corp", distance: "42km", crop: "All grains", rating: "4.6", price: "₹2,300/Quintal" },
-  { id: 3, name: "Local Market Co-op", distance: "8km", crop: "Vegetables, Fruits", rating: "4.3", price: "₹1,800/Quintal" }
-];
+import { fetchBuyers, listCropForSale } from "../services/marketplaceService";
 
 const mockLogistics = [
   { id: 1, name: "AgroTrans Logistics", type: "Local Truckers", capacity: "5 Tons", rating: "4.7", price: "₹3/km" },
@@ -18,10 +13,47 @@ export default function Marketplace({ userLocation, setUserLocation }) {
   const [cropType, setCropType] = useState("");
   const [quantity, setQuantity] = useState("");
   const [buyers, setBuyers] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [showLogistics, setShowLogistics] = useState(false);
+  const [price, setPrice] = useState("");
+  const [contact, setContact] = useState("");
+  const [listResponse, setListResponse] = useState(null);
 
-  const findBuyers = () => {
-    setBuyers(mockBuyers);
+  const findBuyers = async () => {
+    if (!cropType || !quantity || !userLocation) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchBuyers(cropType, userLocation);
+      const list = Array.isArray(res?.buyers) ? res.buyers : [];
+      setBuyers(list);
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message || "Failed to fetch buyers");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const listMyCrop = async () => {
+    if (!cropType || !quantity || !userLocation || !price || !contact) return;
+    setLoading(true);
+    setError(null);
+    setListResponse(null);
+    try {
+      const res = await listCropForSale({
+        cropType,
+        quantity: Number(quantity),
+        location: userLocation,
+        price,
+        contact
+      });
+      setListResponse(res);
+    } catch (e) {
+      setError(e?.response?.data?.error || e.message || "Failed to list crop");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -61,11 +93,56 @@ export default function Marketplace({ userLocation, setUserLocation }) {
             placeholder="Enter your location" 
           />
         </label>
+
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: "0.75rem", marginTop: "0.5rem" }}>
+          <label>
+            Expected Price (e.g., ₹2500/Quintal)
+            <input 
+              type="text" 
+              value={price} 
+              onChange={e => setPrice(e.target.value)} 
+              placeholder="Enter expected price"
+            />
+          </label>
+          <label>
+            Contact Number
+            <input 
+              type="tel" 
+              value={contact} 
+              onChange={e => setContact(e.target.value)} 
+              placeholder="+91-XXXXXXXXXX"
+            />
+          </label>
+        </div>
         
-        <button onClick={findBuyers} disabled={!cropType || !quantity || !userLocation}>
-          Find Buyers
-        </button>
+        <div style={{ display: "flex", gap: "0.5rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+          <button onClick={findBuyers} disabled={!cropType || !quantity || !userLocation || loading}>
+            {loading ? "Loading..." : "Find Buyers"}
+          </button>
+          <button onClick={listMyCrop} disabled={!cropType || !quantity || !userLocation || !price || !contact || loading}>
+            {loading ? "Listing..." : "List My Crop"}
+          </button>
+        </div>
       </div>
+
+      {error && (
+        <div className="card error" style={{ marginTop: "1rem" }}>
+          <h3>Error</h3>
+          <p>{String(error)}</p>
+        </div>
+      )}
+
+      {listResponse && (
+        <div className="card success" style={{ marginTop: "1rem" }}>
+          <h3>Listing Created</h3>
+          <p>{listResponse.message || "Your crop has been listed successfully."}</p>
+          {Array.isArray(listResponse.tips) && (
+            <ul>
+              {listResponse.tips.map((t, i) => <li key={i}>• {t}</li>)}
+            </ul>
+          )}
+        </div>
+      )}
 
       {buyers.length > 0 && (
         <div style={{ marginTop: "2rem" }}>

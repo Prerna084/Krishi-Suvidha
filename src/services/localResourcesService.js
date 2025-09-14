@@ -1,5 +1,6 @@
 import { get } from "./api";
 
 export async function fetchKrishiKendras(location) {
-  return get(`krishi-kendras?location=${encodeURIComponent(location)}`);
+  // Backend endpoint is /api/krishi-kendra (singular)
+  return get(`krishi-kendra?location=${encodeURIComponent(location)}`);
 }
