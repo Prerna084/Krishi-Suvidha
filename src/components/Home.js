@@ -1,4 +1,4 @@
-import React from "react";
+ import React from "react";
 import { useNavigate } from "react-router-dom";
 
 export default function Home() {
@@ -7,21 +7,23 @@ export default function Home() {
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}
-      <section className="hero-pattern text-white py-20">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-4xl font-bold mb-6">Transforming Punjab Agriculture with Technology</h2>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
+      <section className="relative hero-pattern text-white py-24 md:py-28">
+        <div className="container mx-auto px-4 text-center max-w-4xl">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 border-0">
+            Transforming Punjab Agriculture with Technology
+          </h2>
+          <p className="text-lg md:text-xl mb-10 text-white/90">
             Your one-stop solution for crop advice, market prices, government schemes, and modern farming techniques
           </p>
-          <div className="flex justify-center space-x-4">
+          <div className="flex justify-center gap-3 md:gap-4">
             <button
-              className="bg-white text-green-800 font-semibold px-6 py-3 rounded-lg shadow-md hover:bg-green-50"
+              className="bg-white text-green-800 font-semibold px-6 py-3 rounded-lg shadow-sm hover:bg-green-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               onClick={() => navigate("/marketplace")}
             >
               Get Started
             </button>
             <button
-              className="bg-transparent border-2 border-white text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-800"
+              className="bg-transparent ring-2 ring-white/80 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
               onClick={() => navigate("/schemes")}
             >
               Watch Demo
@@ -76,7 +78,7 @@ export default function Home() {
 
             <div
               className="bg-purple-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
-              onClick={() => navigate("/disease-detection")}
+              onClick={() => navigate("/chatbot")}
             >
               <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,7 +93,7 @@ export default function Home() {
       </section>
 
       {/* Key Features Section */}
-      <section id="features" className="py-16 bg-gray-50">
+      <section id="features" className="py-16 bg-gray-50 scroll-offset">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Our Services for Punjab Farmers</h2>
 
@@ -183,7 +185,7 @@ export default function Home() {
       </section>
 
       {/* Market Price Section */}
-      <section id="market" className="py-16 bg-white">
+      <section id="market" className="py-16 bg-white scroll-offset">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">Real-Time Market Prices</h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">
@@ -292,7 +294,7 @@ export default function Home() {
       </section>
 
       {/* Government Schemes Section */}
-      <section id="schemes" className="py-16 bg-gray-100">
+      <section id="schemes" className="py-16 bg-gray-100 scroll-offset">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-8">Government Schemes</h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">

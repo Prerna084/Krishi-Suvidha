@@ -12,6 +12,7 @@ import CropAdvice from "./components/CropAdvice";
 import GroupFarming from "./components/GroupFarming";
 import Schemes from "./components/Schemes";
 import Home from "./components/Home";
+import Chatbot from "./components/Chatbot";
 
 function App() {
   const [userLocation, setUserLocation] = useState("");
@@ -32,6 +33,7 @@ function App() {
           <Route path="/crop-advice" element={<CropAdvice userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="/group-farming" element={<GroupFarming userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="/schemes" element={<Schemes />} />
+          <Route path="/chatbot" element={<Chatbot />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </main>

@@ -1309,43 +1309,141 @@ app.post('/api/sms-support', (req, res) => {
 });
 
 // 20. AI Chatbot API
-app.post('/api/chatbot', (req, res) => {
-  const { message, language, context } = req.body;
-  
-  // Simple rule-based responses (replace with actual AI in production)
-  const responses = {
-    "weather": "आज का मौसम साफ है। तापमान 28°C है। सिंचाई की जरूरत नहीं।",
-    "soil": "मिट्टी की जांच के लिए नजदीकी कृषि केंद्र से संपर्क करें। pH 6-7 बेहतर है।",
-    "disease": "पत्तियों पर धब्बे दिख रहे हैं? तस्वीर भेजें, हम बीमारी की पहचान करेंगे।",
-    "price": "गेहूं का आज का भाव ₹2,450 प्रति क्विंटल है। कल तक यही रहेगा।",
-    "scheme": "PM-KISAN के लिए आधार और बैंक डिटेल चाहिए। ऑनलाइन अप्लाई करें।"
-  };
-
-  const query = message.toLowerCase();
-  let response = "मुझे समझ नहीं आया। कृपया स्पष्ट करें या हेल्पलाइन 1800-180-1570 पर कॉल करें।";
-
-  for (const [key, value] of Object.entries(responses)) {
-    if (query.includes(key) || query.includes(key.replace(/[aeiou]/g, ''))) {
-      response = value;
-      break;
-    }
+app.post('/api/chatbot', async (req, res) => {
+  const { message = "", language = "English", context = {} } = req.body;
+  const msg = String(message).trim();
+  if (!msg) {
+    return res.json({
+      response: "Please type your question. For example: Weather in Amritsar, Market price for Wheat, or Crop advice for Rabi in Ludhiana.",
+      suggestions: ["Weather in Amritsar", "Market price for Wheat", "Crop advice for Rabi", "Water availability in Patiala"]
+    });
   }
 
-  res.json({
-    response,
-    suggestions: [
-      "मौसम की जानकारी",
-      "मिट्टी की जांच",
-      "बीमारी की पहचान",
-      "बाजार भाव",
-      "सरकारी योजना"
-    ],
-    helpOptions: [
-      { text: "विशेषज्ञ से बात करें", action: "call:1800-180-1570" },
-      { text: "वीडियो देखें", action: "videos" },
-      { text: "नजदीकी केंद्र", action: "krishi-kendra" }
-    ]
-  });
+  // Basic NLU helpers
+  const lower = msg.toLowerCase();
+  const find = (re) => {
+    const m = msg.match(re);
+    return m ? m[1].trim() : undefined;
+  };
+
+  // Extract entities
+  const location =
+    context.location ||
+    find(/\b(?:in|at|near)\s+([a-zA-Z ]{3,40})\b/i) ||
+    undefined;
+
+  const cropList = ["wheat", "rice", "mustard", "gram", "maize", "corn", "cotton", "vegetables", "pulses"];
+  const crop = cropList.find(c => lower.includes(c)) || undefined;
+
+  const soil = find(/\b(loamy|clay|sandy|silty)\b/i) || undefined;
+  const season = find(/\b(kharif|rabi)\b/i) || undefined;
+
+  // Intents
+  const isWeather = /(weather|temperature|rain|forecast)/i.test(lower);
+  const isPrice = /(price|market|mandi|rate)/i.test(lower);
+  const isAdvice = /(advice|what.*grow|which.*crop|recommend.*crop|crop advice|best crop)/i.test(lower);
+  const isWater = /(water|availability|canal|groundwater|irrigation)/i.test(lower);
+  const isScheme = /(scheme|subsidy|pm[-\s]?kisan|insurance|yojana)/i.test(lower);
+  const isDisease = /(disease|pest|symptom|leaf|rust|blight|aphid)/i.test(lower);
+
+  // Helper to call local APIs
+  const BASE = "http://localhost:5000/api";
+
+  try {
+    if (isWeather) {
+      const loc = location || "your area";
+      const { data } = await axios.get(`${BASE}/weather`, { params: { location: loc } });
+      const resp = `Weather for ${data.location}: Temp ${data.temperature}°C, Humidity ${data.humidity}%, Rainfall ${data.rainfall} mm. Advisory: ${data.advisory}`;
+      return res.json({
+        response: resp,
+        suggestions: [
+          "Crop advice for Rabi",
+          "Water availability status",
+          "Disease alerts",
+          "Market prices today"
+        ]
+      });
+    }
+
+    if (isPrice) {
+      const loc = location || "Punjab";
+      const { data } = await axios.get(`${BASE}/market-prices`, { params: { location: loc, cropType: crop } });
+      const prices = data.currentPrices || {};
+      const top = Object.entries(prices)
+        .slice(0, 4)
+        .map(([k, v]) => `${k}: ${v.price} (${v.trend})`)
+        .join(", ");
+      return res.json({
+        response: `Market prices near ${loc}: ${top}. Forecast: ${data.forecast?.nextWeek || "Stable"}`
+      });
+    }
+
+    if (isAdvice) {
+      const loc = location || "Punjab";
+      const payload = {
+        location: loc,
+        soilType: soil,
+        season: season ? season[0].toUpperCase() + season.slice(1).toLowerCase() : undefined,
+        currentCrop: crop ? crop[0].toUpperCase() + crop.slice(1).toLowerCase() : undefined
+      };
+      const { data } = await axios.post(`${BASE}/crop-advice`, payload);
+      const recs = Array.isArray(data?.recommendedCrops) ? data.recommendedCrops.slice(0, 3) : [];
+      if (!recs.length) {
+        return res.json({
+          response: "I couldn't derive specific advice. Please run soil analysis and weather first, or specify season and soil type."
+        });
+      }
+      const list = recs.map(r => `${r.name} (${r.suitability}, ${r.suitabilityScore}%)`).join("; ");
+      return res.json({
+        response: `Top crop recommendations for ${loc}: ${list}. Tips: ${data.seasonalTips?.slice(0,2).join(" | ") || "Use certified seeds and plan irrigation by forecast."}`,
+        suggestions: ["Water availability in my area", "Market prices today", "Disease alerts"]
+      });
+    }
+
+    if (isWater) {
+      const loc = location || "Punjab";
+      const { data } = await axios.get(`${BASE}/water-availability`, { params: { location: loc } });
+      const overall = data.overallStatus || "Check required";
+      const src = Array.isArray(data.sources) ? data.sources[0] : undefined;
+      const resp = `Water availability (${loc}): ${overall}. ${src ? `${src.type}: ${src.availability}, quality: ${src.quality || "N/A"}` : ""}`;
+      return res.json({
+        response: resp,
+        suggestions: ["Crop advice for current season", "Drip irrigation tips", "Rainwater harvesting guide"]
+      });
+    }
+
+    if (isScheme) {
+      const { data } = await axios.get(`${BASE}/government-schemes`, { params: { state: "Punjab", q: crop } });
+      const items = (data?.stateSchemes || []).slice(0, 3);
+      if (!items.length) {
+        return res.json({ response: "No matching schemes found right now. Try searching by category like subsidy, insurance, or machinery." });
+      }
+      const text = items.map(s => `• ${s.name}: ${s.description}`).join("\n");
+      return res.json({
+        response: `Top schemes in Punjab:\n${text}`,
+        suggestions: ["PM-KISAN status", "Crop insurance details", "Organic certification support"]
+      });
+    }
+
+    if (isDisease) {
+      return res.json({
+        response: "For disease diagnosis, please upload a clear image of the affected crop leaf/area via the Disease Detection tool. Meanwhile, keep fields clean and avoid overhead irrigation.",
+        suggestions: ["Open Disease Detection", "Nearest Krishi Kendra", "Preventive bio-pesticides"]
+      });
+    }
+
+    // Fallback
+    return res.json({
+      response: "I can help with weather, crop advice, water availability, market prices, government schemes, and disease alerts. Try asking: 'Crop advice for Rabi in Ludhiana' or 'Market price for Wheat'.",
+      suggestions: ["Weather in Amritsar", "Crop advice for Rabi", "Market price for Wheat", "Water availability in Patiala"]
+    });
+  } catch (e) {
+    console.error("chatbot error:", e?.message || e);
+    return res.json({
+      response: "The assistant ran into a problem fetching live data. Please try again shortly.",
+      suggestions: ["Weather now", "Market prices today", "Crop advice"]
+    });
+  }
 });
 
 // 21. Market Price Tracking API

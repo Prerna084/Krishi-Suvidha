@@ -4,12 +4,13 @@ import { NavLink, useNavigate } from "react-router-dom";
 export default function Header({ userType, setUserType }) {
   const navigate = useNavigate();
   const navLinkClass = ({ isActive }) =>
-    isActive
-      ? "bg-green-600 px-3 py-2 rounded text-white"
-      : "px-3 py-2 rounded text-white hover:bg-green-600";
+    (isActive
+      ? "bg-white/15 text-white"
+      : "text-white/90 hover:text-white hover:bg-white/10") +
+    " px-3 py-2 rounded-md transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40";
 
   return (
-    <header className="bg-green-800 text-white">
+    <header className="sticky-header bg-green-800/95 supports-[backdrop-filter]:bg-green-800/80 backdrop-blur text-white shadow-md">
       <div className="container mx-auto px-4 py-3 flex justify-between items-center">
         <div className="flex items-center">
           <img
@@ -24,7 +25,7 @@ export default function Header({ userType, setUserType }) {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center bg-green-700 px-3 py-2 rounded">
+          <div className="hidden md:flex items-center bg-white/10 px-3 py-2 rounded-md border border-white/10 text-white/90">
             <span>ਪੰਜਾਬੀ</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -40,7 +41,7 @@ export default function Header({ userType, setUserType }) {
           <select
             value={userType}
             onChange={(e) => setUserType(e.target.value)}
-            className="bg-green-700 border border-green-600 px-3 py-2 rounded"
+            className="bg-white/10 border-0 px-3 py-2 rounded-md text-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
           >
             <option value="farmer">Farmer</option>
             <option value="buyer">Buyer</option>
@@ -48,7 +49,7 @@ export default function Header({ userType, setUserType }) {
           </select>
 
           <button
-            className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded"
+            className="bg-white text-green-800 hover:bg-green-50 px-4 py-2 rounded-md font-semibold shadow-sm transition-colors"
             onClick={() => navigate("/")}
           >
             Login
@@ -56,16 +57,16 @@ export default function Header({ userType, setUserType }) {
         </div>
       </div>
 
-      <nav className="bg-green-700">
-        <div className="container mx-auto px-4">
-          <ul className="flex flex-wrap space-x-6 py-3">
+      <nav className="bg-green-700/90 border-t border-white/10">
+        <div className="container mx-auto px-4 overflow-x-auto no-scrollbar">
+          <ul className="flex items-center gap-2 md:gap-4 py-3 min-w-max">
             <li>
               <NavLink to="/" className={navLinkClass}>
                 Home
               </NavLink>
             </li>
             <li>
-              <a href="/#features" className="px-3 py-2 rounded text-white hover:bg-green-600">
+              <a href="/#features" className="px-3 py-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
                 Services
               </a>
             </li>
@@ -75,12 +76,12 @@ export default function Header({ userType, setUserType }) {
               </NavLink>
             </li>
             <li>
-              <a href="/#schemes" className="px-3 py-2 rounded text-white hover:bg-green-600">
+              <a href="/#schemes" className="px-3 py-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
                 Govt Schemes
               </a>
             </li>
             <li>
-              <a href="/#market" className="px-3 py-2 rounded text-white hover:bg-green-600">
+              <a href="/#market" className="px-3 py-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
                 Market Prices
               </a>
             </li>
