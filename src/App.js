@@ -13,6 +13,13 @@ import GroupFarming from "./components/GroupFarming";
 import Schemes from "./components/Schemes";
 import Home from "./components/Home";
 import Chatbot from "./components/Chatbot";
+import DiseaseAlerts from "./components/DiseaseAlerts";
+import QualityMonitoring from "./components/QualityMonitoring";
+import Livestock from "./components/Livestock";
+import Vermicompost from "./components/Vermicompost";
+import DroneServices from "./components/DroneServices";
+import MarketPrices from "./components/MarketPrices";
+import Demonstrations from "./components/Demonstrations";
 
 function App() {
   const [userLocation, setUserLocation] = useState("");
@@ -34,6 +41,13 @@ function App() {
           <Route path="/group-farming" element={<GroupFarming userLocation={userLocation} setUserLocation={setUserLocation} />} />
           <Route path="/schemes" element={<Schemes />} />
           <Route path="/chatbot" element={<Chatbot />} />
+          <Route path="/alerts" element={<DiseaseAlerts />} />
+          <Route path="/quality-monitoring" element={<QualityMonitoring />} />
+          <Route path="/livestock" element={<Livestock />} />
+          <Route path="/vermicompost" element={<Vermicompost />} />
+          <Route path="/drone-services" element={<DroneServices />} />
+          <Route path="/market-prices" element={<MarketPrices />} />
+          <Route path="/demonstrations" element={<Demonstrations />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </main>

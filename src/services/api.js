@@ -1,7 +1,15 @@
 
 import axios from "axios";
 
-export const API_BASE_URL = "http://localhost:5000";
+// Prefer 127.0.0.1 for local dev to avoid occasional localhost DNS issues on Windows
+const DEFAULT_BASE = "http://localhost:5000";
+const FALLBACK_BASE = "http://127.0.0.1:5000";
+
+// If running in a browser and the page is served from localhost, prefer 127.0.0.1 for API
+export const API_BASE_URL =
+  typeof window !== "undefined" && window.location && window.location.hostname === "localhost"
+    ? FALLBACK_BASE
+    : DEFAULT_BASE;
 
 const api = axios.create({
   baseURL: API_BASE_URL,

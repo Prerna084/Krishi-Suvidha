@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { getGovernmentSchemes } from "../services/schemesService";
 
 const CATEGORIES = [
@@ -152,6 +152,19 @@ export default function Schemes() {
   const goNext = () => {
     if (hasNext) setFilters((prev) => ({ ...prev, page: prev.page + 1 }));
   };
+
+  // Auto-load initial data
+  useEffect(() => {
+    // Load with default filters on mount
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Auto-fetch on pagination changes
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.page, filters.pageSize]);
 
   return (
     <div className="container mx-auto px-4 py-6">

@@ -701,26 +701,51 @@ app.get('/api/disease-alerts', (req, res) => {
         severity: "Medium",
         affectedCrops: ["Wheat"],
         symptoms: "Orange-brown pustules on leaves",
-        action: "Apply fungicide immediately",
-        preventive: "Use resistant varieties"
+        action: "Apply neem-based fungicide or tebuconazole if severe",
+        preventive: "Use resistant varieties and avoid overhead irrigation"
       },
       {
         pest: "Aphids",
         severity: "Low",
         affectedCrops: ["Mustard", "Pea"],
         symptoms: "Small green insects on leaves",
-        action: "Spray neem oil solution",
-        preventive: "Maintain field hygiene"
+        action: "Spray 2% neem oil or soap solution; encourage ladybird beetles",
+        preventive: "Maintain field hygiene; avoid excess nitrogen"
       }
     ],
     seasonalForecast: [
       "Late blight expected in potato crops next month",
       "Bollworm attack likely in cotton during flowering"
     ],
+    postHarvestAlerts: [
+      {
+        issue: "Aspergillus storage mold",
+        risk: "High in humid storage (>70% RH) and damp grains (>12-13% moisture)",
+        detection: "Musty odor, discolored/greenish-black patches in stored grains",
+        mitigation: [
+          "Sun-dry grains to 10-12% moisture before storage",
+          "Use breathable gunny bags on pallets, not directly on floor",
+          "Maintain store ventilation; use silica/quick-lime desiccants if needed",
+          "Periodic turning and inspection; remove infested lots"
+        ]
+      },
+      {
+        pest: "Rice weevil",
+        risk: "Medium during warm months in wheat/rice stores",
+        detection: "Small holes and powdered frass at bag bottoms",
+        mitigation: [
+          "Triple-clean and sun-expose bags before reuse",
+          "Mix dried neem leaves or 1% diatomaceous earth with grains",
+          "Use pheromone traps; fumigation by licensed operator if outbreak"
+        ]
+      }
+    ],
     preventiveMeasures: [
-      "Regular field monitoring",
+      "Regular field and store monitoring",
       "Crop rotation practices",
-      "Use of bio-pesticides"
+      "Use of bio-pesticides",
+      "Sun-dry produce to safe moisture before storage",
+      "Clean and sanitize storage structures before filling"
     ]
   };
 
@@ -804,31 +829,64 @@ app.get('/api/demonstrations', (req, res) => {
     upcomingEvents: [
       {
         title: "Drone Spraying Demonstration",
-        date: "2024-02-15",
-        location: "Krishi Vigyan Kendra",
-        description: "Learn about precision agriculture using drones",
+        date: "2025-10-05",
+        location: "Krishi Vigyan Kendra (KVK) Ludhiana",
+        description: "Live UAV demo for organic neem/Bt spraying and calibration basics",
         registration: "Free, call +91-9876543210"
       },
       {
-        title: "Organic Farming Workshop",
-        date: "2024-02-20",
-        location: "Community Center",
-        description: "Hands-on training for organic certification",
+        title: "Kisan Mela: Modern Technologies",
+        date: "2025-10-20",
+        location: "Punjab Agricultural University, Ludhiana",
+        description: "Stalls on drones, precision irrigation, vermicompost, bio-inputs; expert talks",
+        registration: "Register at KVK helpdesk or call +91-9876543212"
+      },
+      {
+        title: "Vermicompost & Bio-pesticide Workshop",
+        date: "2025-11-02",
+        location: "Community Center, Jalandhar",
+        description: "Hands-on prep of Jeevamrit, Panchagavya; storage and application methods",
         registration: "₹100, limited seats"
       }
     ],
     videos: [
       {
-        title: "Modern Irrigation Techniques",
-        duration: "15 minutes",
-        language: "Hindi",
-        url: "/videos/irrigation-hindi.mp4"
+        title: "Neem organic spray for farms (Hindi) – best practices",
+        url: "https://www.youtube.com/results?search_query=neem+organic+spray+for+farms+in+hindi"
       },
       {
-        title: "Soil Health Management",
-        duration: "20 minutes",
-        language: "Hindi",
-        url: "/videos/soil-health-hindi.mp4"
+        title: "Vermicompost quick steps",
+        url: "https://www.youtube.com/results?search_query=Vermicompost+quick+steps"
+      },
+      {
+        title: "Drip irrigation setup and fertigation",
+        url: "https://www.youtube.com/results?search_query=Drip+irrigation+setup+and+fertigation"
+      },
+      {
+        title: "Sprayer calibration basics",
+        url: "https://www.youtube.com/results?search_query=Sprayer+calibration+basics"
+      },
+      {
+        title: "Post-harvest grain drying and safe storage",
+        url: "https://www.youtube.com/results?search_query=Post-harvest+grain+drying+and+safe+storage"
+      },
+      {
+        title: "Dairy manure to vermicompost",
+        url: "https://www.youtube.com/results?search_query=Dairy+manure+to+vermicompost"
+      }
+    ],
+    reels: [
+      {
+        title: "Neem organic spray for farms (YouTube search)",
+        url: "https://www.youtube.com/results?search_query=neem+organic+spray+for+farms+in+hindi"
+      },
+      {
+        title: "Vermicompost quick steps (YouTube search)",
+        url: "https://www.youtube.com/results?search_query=Vermicompost+quick+steps"
+      },
+      {
+        title: "Drip irrigation setup and fertigation (YouTube search)",
+        url: "https://www.youtube.com/results?search_query=Drip+irrigation+setup+and+fertigation"
       }
     ],
     technologies: [
@@ -837,6 +895,12 @@ app.get('/api/demonstrations', (req, res) => {
         benefits: "30% water saving, 25% yield increase",
         cost: "₹50,000 initial investment",
         subsidy: "50% government subsidy available"
+      },
+      {
+        name: "Agri Drones for Foliar Spraying",
+        benefits: "Uniform coverage, 30% chemical saving, 70% labor reduction",
+        cost: "Service based (₹300–₹600/acre)",
+        subsidy: "State-level schemes and custom hiring centers"
       }
     ]
   };
@@ -887,6 +951,66 @@ app.get('/api/vermicompost', (req, res) => {
       productionCost: "₹5/kg",
       marketPrice: "₹15-20/kg",
       profitMargin: "200-300%"
+    },
+    organicPesticides: [
+      {
+        name: "Jeevamrit (soil tonic and pest deterrent)",
+        ingredients: [
+          "10 kg cow dung (preferably desi cow)",
+          "10 L cow urine",
+          "2 kg jaggery",
+          "2 kg gram flour",
+          "Handful of fertile soil",
+          "Water to make 200 L"
+        ],
+        preparation: "Mix all in drum, keep semi-covered; stir daily for 5-7 days to ferment.",
+        usage: "Soil drench: 200 L/acre after dilution; Foliar spray: 1-2% dilution every 10-15 days."
+      },
+      {
+        name: "Panchagavya (growth promoter and pest deterrent)",
+        ingredients: [
+          "5 kg cow dung",
+          "3 L cow urine",
+          "2 L milk",
+          "2 L curd",
+          "1 L ghee",
+          "3 kg jaggery",
+          "3 L tender coconut water",
+          "3 L fermented banana mash"
+        ],
+        fermentation: "Mix and ferment 7-10 days, stir daily.",
+        foliarSpray: "3% solution every 10-15 days; avoid peak sunlight."
+      },
+      {
+        name: "Neem Seed Kernel Extract (NSKE) 5%",
+        steps: [
+          "Soak 5 kg finely ground neem seeds in 10 L water overnight",
+          "Filter; make up to 100 L with water",
+          "Add 100 ml emulsifier/soap for spread"
+        ],
+        use: "For tender crops dilute to ~2%; up to 5% for severe sucking pests."
+      },
+      {
+        name: "Cow urine + Neem + Tobacco decoction",
+        recipe: "Boil 1 kg tobacco dust + 1 kg neem leaves in 10 L water for 30 min; cool, add 2 L cow urine; filter.",
+        caution: "Use gloves/mask; final field dilution 1-2%. Avoid near harvest and around bee activity."
+      }
+    ],
+    droneSprayGuidelines: {
+      recommendedDilutions: [
+        "Neem oil 0.5–1% with emulsifier; UAV volume 15–20 L/acre",
+        "Bt (Bacillus thuringiensis) as per label; 10–15 L/acre",
+        "Trichoderma for soil-borne diseases: 2–5 g/L in compatible carrier"
+      ],
+      conditions: [
+        "Spray during calm hours (wind < 10 km/h), early morning/late evening",
+        "Maintain buffer from water bodies and apiaries",
+        "Calibrate droplet size 100–200 µm for foliar applications"
+      ],
+      safety: [
+        "Use PPE; follow organic input labels",
+        "Record batch and field logs; avoid spraying during bee foraging"
+      ]
     }
   };
 

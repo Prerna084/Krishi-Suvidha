@@ -24,7 +24,7 @@ export default function Home() {
             </button>
             <button
               className="bg-transparent ring-2 ring-white/80 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-              onClick={() => navigate("/schemes")}
+              onClick={() => navigate("/demonstrations")}
             >
               Watch Demo
             </button>
@@ -65,7 +65,7 @@ export default function Home() {
 
             <div
               className="bg-yellow-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
-              onClick={() => navigate("/marketplace")}
+              onClick={() => navigate("/market-prices")}
             >
               <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -87,6 +87,81 @@ export default function Home() {
               </div>
               <h3 className="font-semibold text-lg mb-2">AI Assistant</h3>
               <p className="text-gray-600">Get instant answers to your queries</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Additional Quick Access */}
+      <section className="py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl font-bold text-center mb-12">More Quick Access</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            <div
+              className="bg-yellow-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
+              onClick={() => navigate("/alerts")}
+            >
+              <div className="bg-yellow-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-yellow-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01M5.07 19h13.86c1.54 0 2.5-1.66 1.73-3L13.73 4a2 2 0 00-3.46 0L3.34 16c-.77 1.34.19 3 1.73 3z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Disease & Pest Alerts</h3>
+              <p className="text-gray-600">Seasonal and post-harvest/storage alerts</p>
+            </div>
+
+            <div
+              className="bg-indigo-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
+              onClick={() => navigate("/quality-monitoring")}
+            >
+              <div className="bg-indigo-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 1.79-3 4s1.343 4 3 4 3-1.79 3-4-1.343-4-3-4z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2 12h3m14 0h3M12 2v3m0 14v3M5.636 5.636l2.121 2.121m8.486 8.486l2.121 2.121M5.636 18.364l2.121-2.121m8.486-8.486l2.121-2.121" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Quality Monitoring</h3>
+              <p className="text-gray-600">Grade crops and map to price tiers</p>
+            </div>
+
+            <div
+              className="bg-teal-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
+              onClick={() => navigate("/livestock")}
+            >
+              <div className="bg-teal-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Livestock & Poultry</h3>
+              <p className="text-gray-600">Health, feed, and sustainability benefits</p>
+            </div>
+
+            <div
+              className="bg-emerald-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
+              onClick={() => navigate("/vermicompost")}
+            >
+              <div className="bg-emerald-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6v6l4 2" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12a9 9 0 1018 0 9 9 0 10-18 0z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Vermicompost & Organics</h3>
+              <p className="text-gray-600">Recipes using cattle/poultry waste</p>
+            </div>
+
+            <div
+              className="bg-purple-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
+              onClick={() => navigate("/drone-services")}
+            >
+              <div className="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 10h3l3-3h6l3 3h3M5 19h14M12 14v5" />
+                </svg>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Drone Spraying</h3>
+              <p className="text-gray-600">Organic pesticide application</p>
             </div>
           </div>
         </div>
@@ -158,7 +233,7 @@ export default function Home() {
                 <li>Drone technology for spraying</li>
                 <li>Water conservation methods</li>
               </ul>
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/local-resources")}>
+              <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/demonstrations")}>
                 Watch Videos
               </button>
             </div>
@@ -170,7 +245,7 @@ export default function Home() {
                   className="rounded"
                 />
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <button className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700" onClick={() => navigate("/local-resources")}>
+                  <button className="bg-green-600 text-white p-4 rounded-full hover:bg-green-700" onClick={() => navigate("/demonstrations")}>
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -208,7 +283,7 @@ export default function Home() {
                 <option>Cotton</option>
                 <option>Sugarcane</option>
               </select>
-              <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/marketplace")}>
+              <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/market-prices")}>
                 Check Prices
               </button>
             </div>

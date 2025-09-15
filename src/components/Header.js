@@ -81,9 +81,34 @@ export default function Header({ userType, setUserType }) {
               </a>
             </li>
             <li>
-              <a href="/#market" className="px-3 py-2 rounded-md text-white/90 hover:text-white hover:bg-white/10 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40">
+              <NavLink to="/market-prices" className={navLinkClass}>
                 Market Prices
-              </a>
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/alerts" className={navLinkClass}>
+                Alerts
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/quality-monitoring" className={navLinkClass}>
+                Quality
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/livestock" className={navLinkClass}>
+                Livestock
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/vermicompost" className={navLinkClass}>
+                Vermicompost
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/drone-services" className={navLinkClass}>
+                Drones
+              </NavLink>
             </li>
             <li>
               <NavLink to="/local-resources" className={navLinkClass}>
