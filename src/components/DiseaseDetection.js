@@ -35,104 +35,143 @@ export default function DiseaseDetection({ userLocation, setUserLocation }) {
   };
 
   return (
-    <div>
-      <h2>Crop Disease Detection</h2>
-      
-      <div className="card">
-        <label>
-          Crop Type
-          <select value={cropType} onChange={e => setCropType(e.target.value)}>
-            <option value="">Select crop</option>
-            <option value="wheat">Wheat</option>
-            <option value="rice">Rice</option>
-            <option value="corn">Corn</option>
-            <option value="vegetables">Vegetables</option>
-            <option value="fruits">Fruits</option>
-          </select>
-        </label>
+    <div className="container mx-auto px-4 py-6">
+      <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-6">Crop Disease Detection</h2>
 
-        <label>
-          Farm Location
-          <input 
-            type="text" 
-            value={userLocation} 
-            onChange={e => setUserLocation(e.target.value)} 
-            placeholder="Enter your farm location" 
-          />
-        </label>
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <label className="block">
+            <span className="block text-sm font-medium text-gray-700 mb-1">Crop Type</span>
+            <select
+              value={cropType}
+              onChange={(e) => setCropType(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-2 focus:ring-green-600"
+            >
+              <option value="">Select crop</option>
+              <option value="wheat">Wheat</option>
+              <option value="rice">Rice</option>
+              <option value="corn">Corn</option>
+              <option value="vegetables">Vegetables</option>
+              <option value="fruits">Fruits</option>
+            </select>
+          </label>
 
-        <label>
-          Upload Image of Affected Crop
-          <input 
-            type="file" 
-            accept="image/*" 
-            onChange={handleImageChange}
-            style={{ padding: '0.5rem' }}
-          />
-        </label>
+          <label className="block">
+            <span className="block text-sm font-medium text-gray-700 mb-1">Farm Location</span>
+            <input
+              type="text"
+              value={userLocation}
+              onChange={(e) => setUserLocation(e.target.value)}
+              placeholder="Enter your farm location"
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-600"
+            />
+          </label>
+
+          <label className="block">
+            <span className="block text-sm font-medium text-gray-700 mb-1">Upload Image of Affected Crop</span>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 bg-white"
+            />
+          </label>
+        </div>
 
         {imagePreview && (
-          <div style={{ marginTop: '1rem' }}>
-            <img 
-              src={imagePreview} 
-              alt="Uploaded crop for disease detection" 
-              style={{ maxWidth: '300px', maxHeight: '200px' }}
+          <div className="mt-4">
+            <img
+              src={imagePreview}
+              alt="Uploaded crop for disease detection"
+              className="max-w-xs max-h-52 rounded border border-gray-200"
             />
           </div>
         )}
 
-        <button onClick={detectDisease} disabled={!cropType || !userLocation || !imageFile || loading}>
-          {loading ? "Analyzing..." : "Detect Disease"}
-        </button>
+        <div className="mt-4">
+          <button
+            onClick={detectDisease}
+            disabled={!cropType || !userLocation || !imageFile || loading}
+            className="bg-green-600 hover:bg-green-700 disabled:opacity-60 disabled:cursor-not-allowed text-white font-medium px-4 py-2 rounded-lg"
+          >
+            {loading ? "Analyzing..." : "Detect Disease"}
+          </button>
+        </div>
       </div>
 
       {error && (
-        <div className="card error" style={{ marginTop: "1rem" }}>
-          <h3>Error</h3>
-          <p>{String(error)}</p>
+        <div className="mt-4 bg-red-50 border border-red-200 text-red-800 rounded-lg p-4">
+          <h3 className="text-lg font-semibold mb-1">Error</h3>
+          <p className="text-sm">{String(error)}</p>
         </div>
       )}
 
       {results && (
-        <div style={{ marginTop: "2rem" }}>
-          <div className="card">
-            <h3>Diagnosis Results</h3>
-            <p><strong>Disease:</strong> {results.disease}</p>
-            <p><strong>Confidence:</strong> {results.confidence}</p>
-            <p><strong>Description:</strong> {results.description}</p>
+        <div className="mt-6 space-y-4">
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Diagnosis Results</h3>
+            <div className="grid gap-3 grid-cols-1 sm:grid-cols-2">
+              <p className="text-gray-700">
+                <strong>Disease:</strong> {results.disease}
+              </p>
+              <p className="text-gray-700">
+                <strong>Confidence:</strong> {results.confidence}
+              </p>
+              <p className="text-gray-700 sm:col-span-2">
+                <strong>Description:</strong> {results.description}
+              </p>
+            </div>
           </div>
 
-          <div className="card error">
-            <h3>Recommended Treatment</h3>
-            <ul>
+          <div className="bg-red-50 border border-red-200 text-red-900 rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">Recommended Treatment</h3>
+            <ul className="list-disc list-inside space-y-1">
               {results.remedies.map((remedy, index) => (
-                <li key={index}>💊 {remedy}</li>
+                <li key={index} className="flex items-start">
+                  <span className="mr-2">💊</span>
+                  <span>{remedy}</span>
+                </li>
               ))}
             </ul>
           </div>
 
-          <div className="card success">
-            <h3>Preventive Measures</h3>
-            <ul>
+          <div className="bg-green-50 border border-green-200 text-green-900 rounded-lg p-6">
+            <h3 className="text-xl font-semibold mb-2">Preventive Measures</h3>
+            <ul className="list-disc list-inside space-y-1">
               {results.preventive.map((preventive, index) => (
-                <li key={index}>🛡️ {preventive}</li>
+                <li key={index} className="flex items-start">
+                  <span className="mr-2">🛡️</span>
+                  <span>{preventive}</span>
+                </li>
               ))}
             </ul>
           </div>
 
-          <div className="card">
-            <h3>Nearest Krishi Kendra Support</h3>
-            <p><strong>Name:</strong> {results.krishiKendra.name}</p>
-            <p><strong>Distance:</strong> {results.krishiKendra.distance}</p>
-            <p><strong>Phone:</strong> 
-              <a href={`tel:${results.krishiKendra.phone}`} style={{ color: '#2e7d32', marginLeft: '0.5rem' }}>
-                {results.krishiKendra.phone}
-              </a>
-            </p>
-            <p><strong>Address:</strong> {results.krishiKendra.address}</p>
-            <button onClick={() => window.location.href = `tel:${results.krishiKendra.phone}`}>
-              📞 Call Now
-            </button>
+          <div className="bg-white rounded-lg shadow p-6">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2">Nearest Krishi Kendra Support</h3>
+            <div className="space-y-1 text-gray-700">
+              <p>
+                <strong>Name:</strong> {results.krishiKendra.name}
+              </p>
+              <p>
+                <strong>Distance:</strong> {results.krishiKendra.distance}
+              </p>
+              <p className="flex items-center">
+                <strong>Phone:</strong>
+                <a href={`tel:${results.krishiKendra.phone}`} className="text-green-700 ml-2">
+                  {results.krishiKendra.phone}
+                </a>
+              </p>
+              <p>
+                <strong>Address:</strong> {results.krishiKendra.address}
+              </p>
+              <button
+                onClick={() => (window.location.href = `tel:${results.krishiKendra.phone}`)}
+                className="mt-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg"
+              >
+                📞 Call Now
+              </button>
+            </div>
           </div>
         </div>
       )}

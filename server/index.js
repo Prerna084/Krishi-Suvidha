@@ -345,33 +345,324 @@ app.get('/api/water-availability', (req, res) => {
   res.json(waterData);
 });
 
-// 4. Crop Advice API
-app.post('/api/crop-advice', (req, res) => {
+ // 4. Crop Advice API (Smart, data-driven)
+app.post('/api/crop-advice', async (req, res) => {
   const { location, soilType, season, currentCrop } = req.body;
-  
+
   if (!location) {
     return res.status(400).json({ error: 'Location is required' });
   }
 
-  const advice = {
-    recommendedCrops: [
-      { name: "Wheat", suitability: "High", expectedYield: "40-45 quintals/hectare", season: "Rabi" },
-      { name: "Mustard", suitability: "Medium", expectedYield: "15-20 quintals/hectare", season: "Rabi" },
-      { name: "Gram", suitability: "High", expectedYield: "20-25 quintals/hectare", season: "Rabi" }
-    ],
-    diversificationOptions: [
-      "Intercropping wheat with mustard",
-      "Crop rotation with legumes",
-      "Kitchen gardening for additional income"
-    ],
-    seasonalTips: [
-      "Prepare land for Rabi season sowing",
-      "Apply organic manure before sowing",
-      "Ensure proper seed treatment"
-    ]
-  };
+  // Helper to fetch latest row for a location
+  const dbGet = (sql, params = []) =>
+    new Promise((resolve, reject) => {
+      db.get(sql, params, (err, row) => (err ? reject(err) : resolve(row)));
+    });
 
-  res.json(advice);
+  try {
+    // Fetch latest context if available
+    const soilRow = await dbGet(
+      `SELECT ph_level, nitrogen, phosphorus, potassium
+         FROM soil_analysis
+        WHERE location LIKE ?
+        ORDER BY id DESC
+        LIMIT 1`,
+      [`%${location}%`]
+    ).catch(() => null);
+
+    const weatherRow = await dbGet(
+      `SELECT temperature, humidity, rainfall, wind_speed, advisory
+         FROM weather_data
+        WHERE location LIKE ?
+        ORDER BY id DESC
+        LIMIT 1`,
+      [`%${location}%`]
+    ).catch(() => null);
+
+    const waterRow = await dbGet(
+      `SELECT availability_status
+         FROM water_availability
+        WHERE location LIKE ?
+        ORDER BY id DESC
+        LIMIT 1`,
+      [`%${location}%`]
+    ).catch(() => null);
+
+    // Basic market signals (mirror of market-prices route trends)
+    const marketTrends = {
+      wheat: 'up',
+      rice: 'stable',
+      mustard: 'down',
+      gram: 'up',
+      corn: 'stable'
+    };
+
+    // Candidate crop library with simple agro-ecological parameters
+    const CANDIDATES = [
+      {
+        name: 'Wheat',
+        season: 'Rabi',
+        soil: ['loamy', 'clay'],
+        waterNeed: 'Medium',
+        expectedYield: '40-45 quintals/hectare',
+        tempRange: [10, 25],
+        rainfallRange: [0, 80],
+        marketKey: 'wheat',
+        inputs: ['Certified seed', 'DAP/Urea', 'Timely irrigation']
+      },
+      {
+        name: 'Rice',
+        season: 'Kharif',
+        soil: ['clay', 'silty'],
+        waterNeed: 'High',
+        expectedYield: '50-60 quintals/hectare',
+        tempRange: [20, 35],
+        rainfallRange: [100, 300],
+        marketKey: 'rice',
+        inputs: ['Paddy seedlings', 'FYM', 'Standing water management']
+      },
+      {
+        name: 'Mustard',
+        season: 'Rabi',
+        soil: ['loamy', 'sandy'],
+        waterNeed: 'Low',
+        expectedYield: '12-20 quintals/hectare',
+        tempRange: [10, 25],
+        rainfallRange: [20, 60],
+        marketKey: 'mustard',
+        inputs: ['Quality seed', 'Basal fertilizer', 'One irrigation']
+      },
+      {
+        name: 'Gram',
+        season: 'Rabi',
+        soil: ['sandy', 'loamy'],
+        waterNeed: 'Low',
+        expectedYield: '15-20 quintals/hectare',
+        tempRange: [15, 25],
+        rainfallRange: [20, 60],
+        marketKey: 'gram',
+        inputs: ['Seed inoculation', 'Low irrigation', 'Weed control']
+      },
+      {
+        name: 'Maize',
+        season: 'Kharif',
+        soil: ['loamy', 'silty'],
+        waterNeed: 'Medium',
+        expectedYield: '30-40 quintals/hectare',
+        tempRange: [20, 30],
+        rainfallRange: [50, 150],
+        marketKey: 'corn',
+        inputs: ['Fertilizer management', '2-3 irrigations', 'Pest monitoring']
+      }
+    ];
+
+    const clamp = (x, min, max) => Math.max(min, Math.min(max, x));
+
+    const recommendations = CANDIDATES.map((crop) => {
+      let score = 50;
+      const rationale = [];
+
+      // Soil type preference
+      if (soilType) {
+        if (crop.soil.includes(String(soilType).toLowerCase())) {
+          score += 10;
+          rationale.push(`Matches soil type: ${soilType}`);
+        } else {
+          score -= 5;
+          rationale.push(`Less suitable for soil type: ${soilType}`);
+        }
+      }
+
+      // Season preference
+      if (season) {
+        if (String(season).toLowerCase() === String(crop.season).toLowerCase()) {
+          score += 10;
+          rationale.push(`In-season crop (${crop.season})`);
+        } else {
+          score -= 5;
+          rationale.push(`Out-of-season vs preferred ${crop.season}`);
+        }
+      }
+
+      // Soil analysis factors
+      if (soilRow && typeof soilRow.ph_level === 'number') {
+        const pH = soilRow.ph_level;
+        if (pH >= 6.0 && pH <= 7.5) {
+          score += 5;
+          rationale.push('Optimal pH (6.0–7.5)');
+        } else if (pH < 6.0) {
+          if (crop.name === 'Rice') {
+            score += 3;
+            rationale.push('Acidic soil tolerable for rice');
+          } else {
+            score -= 4;
+            rationale.push('Acidic soil: apply lime and prefer tolerant crops');
+          }
+        } else if (pH > 7.5) {
+          if (crop.name === 'Mustard' || crop.name === 'Gram') {
+            score += 3;
+            rationale.push('Slightly alkaline soil okay for mustard/gram');
+          } else {
+            score -= 4;
+            rationale.push('Alkaline soil: add organic matter/sulfur');
+          }
+        }
+      }
+      if (soilRow && soilRow.nitrogen && String(soilRow.nitrogen).toLowerCase() === 'low') {
+        if (crop.name === 'Gram') {
+          score += 6;
+          rationale.push('Low nitrogen: prefer legumes like gram');
+        } else {
+          score -= 2;
+          rationale.push('Low nitrogen may reduce yield');
+        }
+      }
+
+      // Weather suitability
+      if (weatherRow) {
+        const t = typeof weatherRow.temperature === 'number' ? weatherRow.temperature : null;
+        const r = typeof weatherRow.rainfall === 'number' ? weatherRow.rainfall : null;
+
+        if (t !== null) {
+          if (t >= crop.tempRange[0] && t <= crop.tempRange[1]) {
+            score += 8;
+            rationale.push(`Temperature suitable (${t}°C)`);
+          } else {
+            score -= 5;
+            rationale.push(`Temperature suboptimal (${t}°C)`);
+          }
+        }
+
+        if (r !== null) {
+          if (r >= crop.rainfallRange[0] && r <= crop.rainfallRange[1]) {
+            score += 8;
+            rationale.push(`Rainfall suitable (${r} mm)`);
+          } else if (r < crop.rainfallRange[0]) {
+            if (crop.waterNeed === 'Low') {
+              score += 2;
+              rationale.push('Low rainfall but crop is low water-need');
+            } else {
+              score -= 6;
+              rationale.push('Low rainfall vs higher water need');
+            }
+          } else {
+            // Higher than range
+            score -= 3;
+            rationale.push('High rainfall may increase disease risk');
+          }
+        }
+      }
+
+      // Water availability status
+      if (waterRow && waterRow.availability_status) {
+        const status = String(waterRow.availability_status).toLowerCase();
+        if (status.includes('adequate') || status.includes('good')) {
+          score += 5;
+          rationale.push('Adequate water availability');
+        } else if (status.includes('poor') || status.includes('low')) {
+          if (crop.waterNeed === 'High') {
+            score -= 10;
+            rationale.push('Poor water availability vs high water need');
+          } else if (crop.waterNeed === 'Low') {
+            score += 5;
+            rationale.push('Poor water availability favors low water-need crops');
+          } else {
+            score -= 4;
+            rationale.push('Limited water may constrain yield');
+          }
+        }
+      }
+
+      // Market signal
+      const trend = marketTrends[crop.marketKey] || 'stable';
+      if (trend === 'up') {
+        score += 5;
+        rationale.push('Market trend: rising prices');
+      } else if (trend === 'down') {
+        score -= 5;
+        rationale.push('Market trend: falling prices');
+      } else {
+        rationale.push('Market trend: stable');
+      }
+
+      // Encourage rotation if same current crop is selected
+      if (currentCrop && String(currentCrop).toLowerCase() === crop.name.toLowerCase()) {
+        score -= 3;
+        rationale.push('Promote crop rotation: slightly penalized current crop');
+      }
+
+      const suitabilityScore = clamp(Math.round(score), 0, 100);
+      const suitability = suitabilityScore >= 75 ? 'High' : suitabilityScore >= 55 ? 'Medium' : 'Low';
+      const risk =
+        (crop.waterNeed === 'High' && waterRow && String(waterRow.availability_status || '').toLowerCase().includes('poor'))
+          ? 'High'
+          : (suitability === 'Low' ? 'Medium' : 'Low');
+
+      const sowingWindow = crop.season === 'Kharif' ? 'June–July' : 'Oct–Nov';
+
+      return {
+        name: crop.name,
+        suitability,
+        suitabilityScore,
+        expectedYield: crop.expectedYield,
+        season: crop.season,
+        waterNeed: crop.waterNeed,
+        risk,
+        marketSignal: trend,
+        rationale,
+        sowingWindow,
+        inputs: crop.inputs
+      };
+    })
+      .sort((a, b) => b.suitabilityScore - a.suitabilityScore)
+      .slice(0, 5);
+
+    // Diversification based on top pick
+    const top = recommendations[0];
+    const diversificationOptions = top
+      ? [
+          `Intercrop ${top.name} with a short-duration legume (e.g., Cowpea/Gram)`,
+          `Rotate ${top.name} next season with a contrasting crop to improve soil health`,
+          'Adopt kitchen/vegetable garden for additional income',
+          'Consider small area for high-margin horticulture if water allows'
+        ]
+      : [
+          'Intercropping cereals with legumes to improve nitrogen',
+          'Adopt crop rotation to break pest cycles',
+          'Pilot a small area for high-value vegetables'
+        ];
+
+    // Seasonal tips enhanced by weather/soil
+    const seasonalTips = [];
+    if (weatherRow && weatherRow.advisory) {
+      seasonalTips.push(weatherRow.advisory);
+    }
+    if (soilRow && typeof soilRow.ph_level === 'number') {
+      const pH = soilRow.ph_level;
+      if (pH < 6.0) seasonalTips.push('Soil acidic: Apply lime (2 t/acre) before sowing');
+      if (pH > 7.5) seasonalTips.push('Soil alkaline: Add organic matter/FYM and elemental sulfur');
+    }
+    seasonalTips.push('Use certified seeds and treat seeds before sowing');
+    seasonalTips.push('Plan irrigation based on 3–5 day weather forecast');
+
+    const response = {
+      recommendedCrops: recommendations,
+      diversificationOptions,
+      seasonalTips,
+      diagnostics: {
+        location,
+        soil: soilRow || null,
+        weather: weatherRow || null,
+        water: waterRow || null,
+        market: marketTrends
+      }
+    };
+
+    res.json(response);
+  } catch (err) {
+    console.error('crop-advice error:', err);
+    res.status(500).json({ error: 'Failed to generate crop advice' });
+  }
 });
 
 // 5. Crop Diversification API
@@ -722,49 +1013,101 @@ app.get('/api/krishi-kendra', (req, res) => {
   res.json(krishiKendras);
 });
 
-// 14. Government Portals API
+/**
+ * 14. Government Schemes API (Enhanced)
+ * Supports filtering by state, category, and search query with basic pagination.
+ * Query params:
+ *  - state (default: Punjab)
+ *  - category (optional; matches scheme.category array/string)
+ *  - q (optional; searches name/description/benefits/eligibility/department)
+ *  - page (default 1), pageSize (default 20)
+ */
 app.get('/api/government-schemes', (req, res) => {
-  const { location, cropType } = req.query;
-  
-  const schemes = {
-    activeSchemes: [
-      {
-        name: "PM-KISAN",
-        description: "Direct income support to farmers",
-        benefit: "₹6,000 per year",
-        eligibility: "All landholding farmers",
-        applicationLink: "https://pmkisan.gov.in",
-        documents: ["Aadhaar", "Bank details", "Land records"]
-      },
-      {
-        name: "Crop Insurance Scheme",
-        description: "Protection against crop loss",
-        benefit: "Up to 100% sum insured",
-        eligibility: "All farmers",
-        applicationLink: "https://pmfby.gov.in",
-        documents: ["Aadhaar", "Bank details", "Sowing certificate"]
-      },
-      {
-        name: "Soil Health Card Scheme",
-        description: "Free soil testing and recommendations",
-        benefit: "Free soil analysis",
-        eligibility: "All farmers",
-        applicationLink: "https://soilhealth.dac.gov.in",
-        documents: ["Aadhaar", "Land records"]
-      }
-    ],
-    applicationStatus: {
-      pmKisan: "Approved - Next installment due March 2024",
-      cropInsurance: "Pending - Submit sowing certificate",
-      soilHealth: "Not applied"
-    },
-    upcomingDeadlines: [
-      { scheme: "Kharif Insurance", deadline: "2024-07-31" },
-      { scheme: "Subsidy Application", deadline: "2024-03-15" }
-    ]
-  };
+  try {
+    const dataPath = path.join(__dirname, 'data', 'schemes.json');
+    if (!fs.existsSync(dataPath)) {
+      return res.status(500).json({ error: 'Schemes dataset not found' });
+    }
+    const raw = fs.readFileSync(dataPath, 'utf-8');
+    const payload = JSON.parse(raw);
 
-  res.json(schemes);
+    const {
+      state = 'Punjab',
+      category,
+      q,
+      page = '1',
+      pageSize = '20'
+    } = req.query;
+
+    const pg = Math.max(parseInt(String(page), 10) || 1, 1);
+    const ps = Math.min(Math.max(parseInt(String(pageSize), 10) || 20, 1), 100);
+
+    const central = Array.isArray(payload.central) ? payload.central : [];
+    const stateMap = payload.states && typeof payload.states === 'object' ? payload.states : {};
+    const stateSchemes = Array.isArray(stateMap[state]) ? stateMap[state] : [];
+
+    const normalizeCategory = (c) => {
+      if (!c) return undefined;
+      return String(c).toLowerCase().trim();
+    };
+    const cat = normalizeCategory(category);
+
+    const matchesCategory = (scheme) => {
+      if (!cat) return true;
+      const sc = scheme.category;
+      if (!sc) return false;
+      if (Array.isArray(sc)) {
+        return sc.some((x) => String(x).toLowerCase().includes(cat));
+      }
+      return String(sc).toLowerCase().includes(cat);
+    };
+
+    const matchesQuery = (scheme) => {
+      if (!q) return true;
+      const needle = String(q).toLowerCase();
+      const hay = [
+        scheme.name,
+        scheme.description,
+        Array.isArray(scheme.benefits) ? scheme.benefits.join(' ') : scheme.benefits,
+        scheme.eligibility,
+        scheme.department
+      ]
+        .filter(Boolean)
+        .map((x) => String(x).toLowerCase())
+        .join(' ');
+      return hay.includes(needle);
+    };
+
+    const filterList = (list) => list.filter((s) => matchesCategory(s) && matchesQuery(s));
+
+    const filteredCentral = filterList(central);
+    const filteredState = filterList(stateSchemes);
+
+    const total = { central: filteredCentral.length, state: filteredState.length };
+
+    const paginate = (list) => {
+      const start = (pg - 1) * ps;
+      return list.slice(start, start + ps);
+    };
+
+    const centralSchemes = paginate(filteredCentral);
+    const stateSchemesPaged = paginate(filteredState);
+
+    res.json({
+      state,
+      category: category || null,
+      q: q || null,
+      page: pg,
+      pageSize: ps,
+      totals: total,
+      centralSchemes,
+      stateSchemes: stateSchemesPaged,
+      notes: payload.metadata?.notes || "Data is indicative. Please verify from official portals."
+    });
+  } catch (err) {
+    console.error('government-schemes error:', err);
+    res.status(500).json({ error: 'Failed to load schemes' });
+  }
 });
 
 // 15. Cold Storage Chain API
@@ -1100,80 +1443,7 @@ app.post('/api/volunteers', (req, res) => {
   );
 });
 
-// 23. Group Farming API
-app.get('/api/group-farming', (req, res) => {
-  const groupFarmingInfo = {
-    nearbyGroups: [
-      {
-        name: "Progressive Farmers Group",
-        location: "Village Rampur",
-        members: 25,
-        crops: ["Wheat", "Mustard"],
-        landArea: "150 acres",
-        coordinator: "+91-9876543260",
-        achievements: "30% cost reduction, 25% yield increase"
-      },
-      {
-        name: "Organic Farming Collective",
-        location: "Village Sundarpur",
-        members: 18,
-        crops: ["Vegetables", "Pulses"],
-        landArea: "80 acres",
-        coordinator: "+91-9876543261",
-        achievements: "Organic certification, premium prices"
-      }
-    ],
-    benefits: [
-      "Cost sharing for expensive machinery",
-      "Bulk procurement of quality inputs",
-      "Collective bargaining for better prices",
-      "Risk sharing and crop insurance",
-      "Knowledge and technology transfer"
-    ],
-    governmentSupport: [
-      "50% subsidy on machinery purchase",
-      "Priority in loan approvals",
-      "Technical support from agricultural universities",
-      "Market linkage assistance"
-    ]
-  };
-  
-  res.json(groupFarmingInfo);
-});
-
-app.post('/api/group-farming', (req, res) => {
-  const { groupName, location, cropType, landArea, coordinatorContact } = req.body;
-  
-  // Create/Join group
-  db.run(
-    `INSERT INTO group_farming (group_name, location, crop_type, land_area, coordinator_contact, members_count) 
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [groupName, location, cropType, landArea, coordinatorContact, 1],
-    function(err) {
-      if (err) {
-        return res.status(500).json({ error: 'Database error' });
-      }
-      
-      res.json({
-        groupId: this.lastID,
-        message: "Group farming initiative created successfully!",
-        benefits: [
-          "Shared machinery costs reduced by 60%",
-          "Bulk purchase of inputs saves 20-30%",
-          "Better negotiation power with buyers",
-          "Knowledge sharing among members"
-        ],
-        nextSteps: [
-          "Invite neighboring farmers to join",
-          "Plan crop calendar together",
-          "Apply for group farming subsidies"
-        ]
-      });
-    }
-  );
-});
-
-// Marketplace endpoints (enhanced)
+ // Marketplace endpoints (enhanced)
 app.get('/api/marketplace', (req, res) => {
   const { crop, location } = req.query;
   
@@ -1243,5 +1513,140 @@ if (require.main === module) {
     console.log("- POST /api/marketplace/list");
   });
 }
+
+/**
+ * Group Farming APIs
+ * GET /api/group-farming
+ * POST /api/group-farming
+ */
+app.get('/api/group-farming', (req, res) => {
+  const { location } = req.query;
+
+  if (!location) {
+    return res.status(400).json({ error: 'Location is required' });
+  }
+
+  const staticGroups = [
+    {
+      name: "Progressive Farmers Group",
+      location: "Village Rampur",
+      members: 25,
+      crops: ["Wheat", "Mustard"],
+      landArea: "150 acres",
+      coordinator: "+91-9876543260",
+      achievements: "30% cost reduction, 25% yield increase"
+    },
+    {
+      name: "Organic Farming Collective",
+      location: "Village Sundarpur",
+      members: 18,
+      crops: ["Vegetables", "Pulses"],
+      landArea: "80 acres",
+      coordinator: "+91-9876543261",
+      achievements: "Organic certification, premium prices"
+    }
+  ];
+
+  const benefits = [
+    "Cost sharing for expensive machinery",
+    "Bulk procurement of quality inputs",
+    "Collective bargaining for better prices",
+    "Risk sharing and crop insurance",
+    "Knowledge and technology transfer"
+  ];
+
+  const governmentSupport = [
+    "50% subsidy on machinery purchase",
+    "Priority in loan approvals",
+    "Technical support from agricultural universities",
+    "Market linkage assistance"
+  ];
+
+  db.all(
+    `SELECT id, group_name, location, crop_type, land_area, coordinator_contact, members_count
+       FROM group_farming
+       WHERE location LIKE ?`,
+    [`%${location}%`],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database error' });
+      }
+
+      const dbGroups = (rows || []).map(r => ({
+        name: r.group_name,
+        location: r.location,
+        members: r.members_count || 1,
+        crops: r.crop_type ? [r.crop_type] : [],
+        landArea: r.land_area,
+        coordinator: r.coordinator_contact,
+        achievements: undefined
+      }));
+
+      res.json({
+        nearbyGroups: [...staticGroups, ...dbGroups],
+        benefits,
+        governmentSupport
+      });
+    }
+  );
+});
+
+app.post('/api/group-farming', (req, res) => {
+  const { groupName, location, cropType, landArea, coordinatorContact } = req.body;
+
+  if (!groupName || !location || !cropType || !landArea || !coordinatorContact) {
+    return res.status(400).json({
+      error: 'groupName, location, cropType, landArea, and coordinatorContact are required'
+    });
+  }
+
+  // Ensure table exists (localized creation to avoid relying on potentially corrupted initialize step)
+  db.run(
+    `CREATE TABLE IF NOT EXISTS group_farming (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      group_name TEXT NOT NULL,
+      location TEXT NOT NULL,
+      crop_type TEXT,
+      land_area TEXT,
+      coordinator_contact TEXT,
+      members_count INTEGER DEFAULT 1,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    )`,
+    (err) => {
+      if (err) {
+        return res.status(500).json({ error: 'Database initialization error' });
+      }
+
+      // Insert group initiative
+      db.run(
+        `INSERT INTO group_farming 
+          (group_name, location, crop_type, land_area, coordinator_contact, members_count) 
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [groupName, location, cropType, landArea, coordinatorContact, 1],
+        function (insertErr) {
+          if (insertErr) {
+            return res.status(500).json({ error: 'Database error' });
+          }
+
+          res.json({
+            groupId: this.lastID,
+            message: "Group farming initiative created successfully!",
+            benefits: [
+              "Shared machinery costs reduced by 60%",
+              "Bulk purchase of inputs saves 20-30%",
+              "Better negotiation power with buyers",
+              "Knowledge sharing among members"
+            ],
+            nextSteps: [
+              "Invite neighboring farmers to join",
+              "Plan crop calendar together",
+              "Apply for group farming subsidies"
+            ]
+          });
+        }
+      );
+    }
+  );
+});
 
 module.exports = app;

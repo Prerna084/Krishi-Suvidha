@@ -1,0 +1,156 @@
+{
+  "metadata": {
+    "notes": "Curated dataset of Central and Punjab Government schemes for farmers. Verify latest details from official portals.",
+    "lastUpdated": "2025-09-14"
+  },
+  "central": [
+    {
+      "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+      "description": "Income support scheme providing ₹6,000 per year to eligible farmer families in three equal installments.",
+      "benefits": ["Direct cash transfer of ₹6,000/year", "No application fee", "Direct Benefit Transfer (DBT)"],
+      "eligibility": "All landholding eligible farmer families (as per scheme guidelines). Exclusions apply (institutional landholders, certain income-tax payers, etc.).",
+      "category": ["income-support"],
+      "department": "Ministry of Agriculture & Farmers Welfare",
+      "applicationLink": "https://pmkisan.gov.in",
+      "documents": ["Aadhaar", "Bank account details", "Land records"],
+      "contact": "PM-KISAN Helpline: 155261 / 011-24300606",
+      "lastUpdated": "2025-09-14"
+    },
+    {
+      "name": "PMFBY (Pradhan Mantri Fasal Bima Yojana)",
+      "description": "Crop insurance to protect farmers against crop failure due to natural calamities, pests & diseases.",
+      "benefits": ["Low premium rates", "Comprehensive risk coverage", "Technology-based claim assessments"],
+      "eligibility": "All farmers growing notified crops in notified areas including sharecroppers and tenant farmers.",
+      "category": ["insurance"],
+      "department": "Ministry of Agriculture & Farmers Welfare",
+      "applicationLink": "https://pmfby.gov.in",
+      "documents": ["Aadhaar", "Bank details", "Sowing certificate/land records"],
+      "contact": "Toll Free: 1800-180-1551",
+      "lastUpdated": "2025-09-14"
+    },
+    {
+      "name": "SMAM (Sub-Mission on Agricultural Mechanization)",
+      "description": "Subsidy support for farm machinery, Custom Hiring Centers (CHCs), Farm Machinery Banks (FMBs) to promote mechanization.",
+      "benefits": ["Subsidy on agricultural machinery", "Support for CHCs/FMBs"],
+      "eligibility": "Individual farmers, groups, FPOs, cooperatives and panchayats as per guidelines.",
+      "category": ["mechanization", "subsidy"],
+      "department": "Department of Agriculture & Farmers Welfare",
+      "applicationLink": "https://agrimachinery.nic.in",
+      "documents": ["Aadhaar", "Bank details", "Quotation/invoice", "Land documents (where applicable)"],
+      "contact": "State Agri Dept / District Agriculture Office",
+      "lastUpdated": "2025-09-14"
+    },
+    {
+      "name": "PM-KUSUM",
+      "description": "Promotes installation of solar pumps and grid-connected solar power plants for irrigation and farmer income.",
+      "benefits": ["Subsidy for standalone solar pumps", "Grid-connected solar plants", "Reduced diesel costs"],
+      "eligibility": "Individual farmers, cooperatives, panchayats, FPOs as per component eligibility.",
+      "category": ["irrigation", "renewable-energy", "subsidy"],
+      "department": "Ministry of New & Renewable Energy (MNRE)",
+      "applicationLink": "https://mnre.gov.in/",
+      "documents": ["Aadhaar", "Bank details", "Land records", "Quotation"],
+      "contact": "State NRE/REDAs and MNRE helplines",
+      "lastUpdated": "2025-09-14"
+    },
+    {
+      "name": "PKVY (Paramparagat Krishi Vikas Yojana)",
+      "description": "Promotes organic farming through cluster approach; supports certification, input management and marketing.",
+      "benefits": ["Cluster-based assistance", "Organic certification support", "Capacity building"],
+      "eligibility": "Farmer groups/CLCs/FPOs forming clusters (usually 50 acres or as notified).",
+      "category": ["organic", "training", "market-linkage"],
+      "department": "Department of Agriculture & Farmers Welfare",
+      "applicationLink": "https://pgsindia-ncof.gov.in",
+      "documents": ["Group details", "Land particulars", "Identity & bank proof"],
+      "contact": "State Organic Cell / NCOF",
+      "lastUpdated": "2025-09-14"
+    },
+    {
+      "name": "PMFME (Pradhan Mantri Formalisation of Micro Food Processing Enterprises)",
+      "description": "Support for micro food processing units, including FPOs, for credit-linked subsidy, branding and marketing.",
+      "benefits": ["35% credit-linked subsidy (capped as per scheme)", "Branding & marketing support", "Capacity building"],
+      "eligibility": "Individual micro-entrepreneurs, FPOs, SHGs, cooperatives engaged in food processing.",
+      "category": ["processing", "credit", "market-linkage"],
+      "department": "Ministry of Food Processing Industries",
+      "applicationLink": "https://pmfme.mofpi.gov.in",
+      "documents": ["Aadhaar", "Bank details", "Project report", "Udyam/registration"],
+      "contact": "PMFME Helpline / State Nodal Agency",
+      "lastUpdated": "2025-09-14"
+    }
+  ],
+  "states": {
+    "Punjab": [
+      {
+        "name": "Punjab Agricultural Mechanization Subsidy",
+        "description": "State subsidy on tractors, power tillers and various farm implements to promote mechanization.",
+        "benefits": ["Subsidy percentage as per implement and category", "Supports timely farm operations"],
+        "eligibility": "Eligible farmers of Punjab; category-wise subsidy norms apply.",
+        "category": ["mechanization", "subsidy"],
+        "department": "Department of Agriculture and Farmers Welfare, Punjab",
+        "applicationLink": "https://agrimachinerypb.com/",
+        "documents": ["Aadhaar", "Bank details", "Quotation", "Land/ownership proof"],
+        "contact": "District Agriculture Office (Punjab)",
+        "lastUpdated": "2025-09-14"
+      },
+      {
+        "name": "Custom Hiring Centers (Punjab)",
+        "description": "Support to set up CHCs for shared access to farm machinery, reducing cost of cultivation.",
+        "benefits": ["Financial assistance for CHC setup", "Promotes shared mechanization"],
+        "eligibility": "Farmer groups, FPOs, cooperatives, panchayats as per guidelines.",
+        "category": ["mechanization", "subsidy", "FPO/FPC"],
+        "department": "Department of Agriculture and Farmers Welfare, Punjab",
+        "applicationLink": "https://agrimachinerypb.com/",
+        "documents": ["Group registration", "Bank details", "Project proposal"],
+        "contact": "District Agriculture Office (Punjab)",
+        "lastUpdated": "2025-09-14"
+      },
+      {
+        "name": "Soil Health Management (Punjab)",
+        "description": "Soil testing services and nutrient management advisories for improved productivity.",
+        "benefits": ["Free/assisted soil testing", "Soil health cards", "Balanced fertilization advisory"],
+        "eligibility": "All farmers in Punjab.",
+        "category": ["soil-health", "advisory"],
+        "department": "Punjab Soil & Water Conservation / Agri Dept",
+        "applicationLink": "https://agripunjab.gov.in/",
+        "documents": ["Basic identity details", "Land details (if required)"],
+        "contact": "Local Agriculture Office / KVK",
+        "lastUpdated": "2025-09-14"
+      },
+      {
+        "name": "Horticulture Development (Punjab)",
+        "description": "Assistance for fruit/vegetable cultivation, nurseries, protected cultivation and post-harvest infrastructure.",
+        "benefits": ["Subsidy on planting material", "Protected cultivation support", "Post-harvest infra"],
+        "eligibility": "Eligible farmers/horticulture growers in Punjab.",
+        "category": ["horticulture", "subsidy", "processing"],
+        "department": "Department of Horticulture, Punjab",
+        "applicationLink": "https://pbhort.gov.in/",
+        "documents": ["Aadhaar", "Land records", "Bank details", "Project proposal (if applicable)"],
+        "contact": "Horticulture Officer (Punjab)",
+        "lastUpdated": "2025-09-14"
+      },
+      {
+        "name": "Dairy Development & Allied Sectors (Punjab)",
+        "description": "Support for dairy farming, fodder development, breed improvement, and allied activities.",
+        "benefits": ["Subsidy/assistance for dairy units", "Fodder development support", "Veterinary services"],
+        "eligibility": "Eligible farmers and dairy entrepreneurs in Punjab.",
+        "category": ["livestock", "credit", "training"],
+        "department": "Department of Animal Husbandry, Dairy Development & Fisheries, Punjab",
+        "applicationLink": "https://ahdd.punjab.gov.in/",
+        "documents": ["Aadhaar", "Bank details", "Unit proposal"],
+        "contact": "District Dairy Development Office (Punjab)",
+        "lastUpdated": "2025-09-14"
+      },
+      {
+        "name": "Punjab Mandi Board Market Linkage Initiatives",
+        "description": "Market linkage and infrastructure support to improve price realization for farmers.",
+        "benefits": ["Access to market platforms", "Infrastructure support", "Price information"],
+        "eligibility": "Farmers and FPOs operating in Punjab.",
+        "category": ["market-linkage", "price-support"],
+        "department": "Punjab State Agricultural Marketing Board",
+        "applicationLink": "https://mandiboard.nic.in/",
+        "documents": ["Basic identity", "FPO registration (if applicable)"],
+        "contact": "Nearest Market Committee Office",
+        "lastUpdated": "2025-09-14"
+      }
+    ]
+  }
+}
