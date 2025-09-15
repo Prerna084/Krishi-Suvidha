@@ -20,6 +20,8 @@ import Vermicompost from "./components/Vermicompost";
 import DroneServices from "./components/DroneServices";
 import MarketPrices from "./components/MarketPrices";
 import Demonstrations from "./components/Demonstrations";
+import Transport from "./components/Transport";
+import ColdStorage from "./components/ColdStorage";
 
 function App() {
   const [userLocation, setUserLocation] = useState("");
@@ -48,6 +50,8 @@ function App() {
           <Route path="/drone-services" element={<DroneServices />} />
           <Route path="/market-prices" element={<MarketPrices />} />
           <Route path="/demonstrations" element={<Demonstrations />} />
+          <Route path="/transport" element={<Transport />} />
+          <Route path="/cold-storage" element={<ColdStorage />} />
           <Route path="*" element={<h2>Page Not Found</h2>} />
         </Routes>
       </main>

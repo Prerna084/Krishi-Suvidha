@@ -25,29 +25,6 @@ export default function Header({ userType, setUserType }) {
         </div>
 
         <div className="flex items-center space-x-4">
-          <div className="hidden md:flex items-center bg-white/10 px-3 py-2 rounded-md border border-white/10 text-white/90">
-            <span>ਪੰਜਾਬੀ</span>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="h-4 w-4 ml-1"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
-            </svg>
-          </div>
-
-          <select
-            value={userType}
-            onChange={(e) => setUserType(e.target.value)}
-            className="bg-white/10 border-0 px-3 py-2 rounded-md text-white/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/50"
-          >
-            <option value="farmer">Farmer</option>
-            <option value="buyer">Buyer</option>
-            <option value="logistics">Logistics</option>
-          </select>
-
           <button
             className="bg-white text-green-800 hover:bg-green-50 px-4 py-2 rounded-md font-semibold shadow-sm transition-colors"
             onClick={() => navigate("/")}
@@ -108,6 +85,21 @@ export default function Header({ userType, setUserType }) {
             <li>
               <NavLink to="/drone-services" className={navLinkClass}>
                 Drones
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/transport" className={navLinkClass}>
+                Transport
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/cold-storage" className={navLinkClass}>
+                Cold Storage
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/demonstrations" className={navLinkClass}>
+                Modern Tech
               </NavLink>
             </li>
             <li>

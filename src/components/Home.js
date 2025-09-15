@@ -1,33 +1,33 @@
- import React from "react";
+import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useI18n } from "../i18n";
 
 export default function Home() {
   const navigate = useNavigate();
+  const { language, setLanguage, t } = useI18n();
 
   return (
     <div className="bg-gray-50">
       {/* Hero Section */}
       <section className="relative hero-pattern text-white py-24 md:py-28">
-        <div className="container mx-auto px-4 text-center max-w-4xl">
-          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 border-0">
-            Transforming Punjab Agriculture with Technology
+        <div className="absolute inset-0 bg-black/50"></div>
+        <div className="relative z-10 container mx-auto px-4 text-center max-w-4xl">
+          <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 border-0 drop-shadow-md">
+            {t("hero.title")}
           </h2>
-          <p className="text-lg md:text-xl mb-10 text-white/90">
-            Your one-stop solution for crop advice, market prices, government schemes, and modern farming techniques
+          <p className="text-lg md:text-xl mb-6 text-white/90">
+            {t("hero.subtitle")}
           </p>
-          <div className="flex justify-center gap-3 md:gap-4">
-            <button
-              className="bg-white text-green-800 font-semibold px-6 py-3 rounded-lg shadow-sm hover:bg-green-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-              onClick={() => navigate("/marketplace")}
+          <div className="mt-4 flex justify-center">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="bg-white/90 text-green-800 px-3 py-2 rounded-md shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-green-700"
             >
-              Get Started
-            </button>
-            <button
-              className="bg-transparent ring-2 ring-white/80 text-white font-semibold px-6 py-3 rounded-lg hover:bg-white hover:text-green-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/60"
-              onClick={() => navigate("/demonstrations")}
-            >
-              Watch Demo
-            </button>
+              <option value="en">English</option>
+              <option value="hi">हिन्दी</option>
+              <option value="pa">ਪੰਜਾਬੀ</option>
+            </select>
           </div>
         </div>
       </section>
@@ -35,7 +35,7 @@ export default function Home() {
       {/* Quick Access Cards */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-12">Quick Access</h2>
+          <h2 className="text-3xl font-bold text-center mb-12">{t("quick.title")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             <div
               className="bg-green-50 rounded-lg p-6 text-center feature-card cursor-pointer shadow-md hover:shadow-lg"
@@ -262,7 +262,7 @@ export default function Home() {
       {/* Market Price Section */}
       <section id="market" className="py-16 bg-white scroll-offset">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Real-Time Market Prices</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t("market.title")}</h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">
             Check updated prices from mandis across Punjab in your preferred language
           </p>
@@ -270,21 +270,21 @@ export default function Home() {
           <div className="bg-gray-50 rounded-lg p-6 mb-8">
             <div className="flex flex-wrap gap-4 mb-6">
               <select className="bg-white border border-gray-300 rounded-lg px-4 py-2">
-                <option>Select District</option>
+                <option>{t("market.selectDistrict")}</option>
                 <option>Amritsar</option>
                 <option>Ludhiana</option>
                 <option>Jalandhar</option>
                 <option>Patiala</option>
               </select>
               <select className="bg-white border border-gray-300 rounded-lg px-4 py-2">
-                <option>Select Crop</option>
+                <option>{t("market.selectCrop")}</option>
                 <option>Wheat</option>
                 <option>Rice</option>
                 <option>Cotton</option>
                 <option>Sugarcane</option>
               </select>
               <button className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700" onClick={() => navigate("/market-prices")}>
-                Check Prices
+                {t("market.cta")}
               </button>
             </div>
 
@@ -328,7 +328,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="bg-green-50 p-6 rounded-lg">
-              <h3 className="text-xl font-semibold mb-4">Shared Transport Facility</h3>
+              <h3 className="text-xl font-semibold mb-4">{t("transport.title")}</h3>
               <p className="text-gray-600 mb-4">Reduce logistics costs by sharing transportation with nearby farmers</p>
               <div className="flex items-center mb-4">
                 <div className="bg-green-100 p-3 rounded-full mr-4">
@@ -341,13 +341,16 @@ export default function Home() {
                   <p className="text-sm text-gray-600">Real-time vehicle tracking for better coordination</p>
                 </div>
               </div>
-              <button className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700">
-                Find Transport Partners
+              <button
+                className="bg-green-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-green-700"
+                onClick={() => navigate("/transport")}
+              >
+                {t("transport.cta")}
               </button>
             </div>
 
             <div className="bg-blue-50 p-6 rounded-lg">
-              <h3 className="text-xl font-semibold mb-4">Cold Storage Locator</h3>
+              <h3 className="text-xl font-semibold mb-4">{t("coldStorage.title")}</h3>
               <p className="text-gray-600 mb-4">Find nearby cold storage facilities with availability status</p>
               <div className="flex items-center mb-4">
                 <div className="bg-blue-100 p-3 rounded-full mr-4">
@@ -360,8 +363,11 @@ export default function Home() {
                   <p className="text-sm text-gray-600">Check temperature and capacity in real-time</p>
                 </div>
               </div>
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700">
-                Find Cold Storage
+              <button
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700"
+                onClick={() => navigate("/cold-storage")}
+              >
+                {t("coldStorage.cta")}
               </button>
             </div>
           </div>
@@ -371,7 +377,7 @@ export default function Home() {
       {/* Government Schemes Section */}
       <section id="schemes" className="py-16 bg-gray-100 scroll-offset">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold text-center mb-8">Government Schemes</h2>
+          <h2 className="text-3xl font-bold text-center mb-8">{t("schemes.title")}</h2>
           <p className="text-center text-gray-600 max-w-3xl mx-auto mb-12">
             Access information about state and central government schemes for farmers
           </p>
@@ -425,7 +431,7 @@ export default function Home() {
 
           <div className="text-center">
             <button className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700" onClick={() => navigate("/schemes")}>
-              View All Schemes
+              {t("schemes.cta")}
             </button>
           </div>
         </div>
